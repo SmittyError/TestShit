@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HARAMBE.ZONE ~ Officially Vibecoded</title>
+<style>
+  :root {
+    --hot: #ff00cc;
+    --lime: #39ff14;
+    --banana: #ffe135;
+    --blood: #ff2020;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+    background: repeating-linear-gradient(45deg, #ffe135 0 40px, #ffd000 40px 80px);
+    color: #111;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+  body.sans { font-family: Arial, sans-serif; }
+  body.upside { transform: rotate(180deg); }
+  body.spin { animation: spin 1.2s ease-in-out; }
+  body.shake { animation: shake 0.4s linear 4; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    25% { transform: translate(-12px,6px); }
+    75% { transform: translate(12px,-6px); }
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes rainbow { to { filter: hue-rotate(360deg); } }
+  @keyframes wobble { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+  header {
+    background: #000;
+    color: var(--lime);
+    text-align: center;
+    padding: 12px 16px 0;
+    border-bottom: 6px dashed var(--hot);
+  }
+  #logo {
+    font-size: clamp(2rem, 7vw, 4.5rem);
+    margin: 0;
+    cursor: pointer;
+    animation: rainbow 3s linear infinite;
+    color: var(--hot);
+    text-shadow: 4px 4px 0 var(--lime), -4px -4px 0 cyan;
+    user-select: none;
+  }
+  .tagline { margin: 4px 0 10px; color: var(--banana); }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+  }
+  nav button {
+    font: inherit;
+    font-size: 1.2rem;
+    padding: 8px 22px;
+    border: 4px outset #ccc;
+    background: linear-gradient(#fff, #999);
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  nav button:hover { transform: scale(1.15) rotate(-4deg); }
+  nav button.active { background: var(--hot); color: #fff; border-style: inset; }
+
+  .marquee {
+    background: var(--blood);
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 6px 0;
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+  }
+  .marquee span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 40s linear infinite;
+  }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+
+  #simonDetector {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #000;
+    color: var(--blood);
+    border: 3px solid var(--blood);
+    padding: 6px 10px;
+    font-weight: bold;
+    z-index: 50;
+    font-size: .85rem;
+    animation: blink 1s step-start infinite;
+  }
+
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+  section { display: none; }
+  section.active { display: block; }
+
+  .card {
+    background: #fff;
+    border: 5px ridge var(--hot);
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: 10px 10px 0 #000;
+  }
+  .card:nth-child(odd) { transform: rotate(-1deg); }
+  .card:nth-child(even) { transform: rotate(1.2deg); }
+  h2 { font-size: 2rem; margin-top: 0; color: var(--hot); text-decoration: underline wavy var(--lime); }
+  h3 { color: #6a00ff; }
+
+  .hero { text-align: center; }
+  .hero img {
+    max-width: 100%;
+    width: 380px;
+    border: 12px solid gold;
+    outline: 6px dashed var(--hot);
+    animation: wobble 2s ease-in-out infinite;
+  }
+  .caption { font-size: .85rem; font-style: italic; }
+
+  ul.facts li { margin: 10px 0; font-size: 1.1rem; }
+  ul.facts li::marker { content: "🍌 "; }
+
+  .roast {
+    background: #000;
+    color: var(--lime);
+    border: 5px double var(--blood);
+  }
+  .roast h2 { color: var(--blood); }
+  .roast li::marker { content: "🚨 "; }
+
+  .wanted {
+    background: #f4e1b5;
+    border: 6px solid #5a3b12;
+    text-align: center;
+    font-family: Georgia, serif;
+    padding: 20px;
+    max-width: 380px;
+    margin: 20px auto;
+  }
+  .wanted h2 { font-size: 3rem; color: #5a3b12; text-decoration: none; margin: 0; letter-spacing: 6px; }
+  .wanted .face { font-size: 6rem; filter: grayscale(1); }
+
+  .btn {
+    font: inherit;
+    font-size: 1.1rem;
+    padding: 10px 18px;
+    background: var(--lime);
+    border: 4px outset var(--lime);
+    cursor: pointer;
+    margin: 6px;
+  }
+  #runaway { position: relative; transition: left .15s, top .15s; }
+
+  .bar { background: #222; border: 3px solid #000; height: 28px; position: relative; overflow: hidden; }
+  .bar div { height: 100%; background: repeating-linear-gradient(90deg, var(--hot) 0 20px, var(--lime) 20px 40px); width: 0; }
+  .bar label { position: absolute; inset: 0; color: #fff; text-align: center; line-height: 28px; font-weight: bold; mix-blend-mode: difference; }
+
+  #respects { font-size: 3rem; color: var(--hot); font-weight: bold; }
+
+  #toast {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    max-width: 320px;
+    background: #000;
+    color: var(--banana);
+    border: 4px solid var(--hot);
+    padding: 12px 14px;
+    z-index: 60;
+    transform: translateY(200%);
+    transition: transform .4s;
+  }
+  #toast.show { transform: translateY(0); }
+
+  .banana {
+    position: fixed;
+    pointer-events: none;
+    font-size: 22px;
+    z-index: 99;
+    animation: fall 1s linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(80px) rotate(360deg); opacity: 0; } }
+
+  footer {
+    text-align: center;
+    background: #000;
+    color: #888;
+    padding: 16px;
+    font-size: .8rem;
+  }
+  footer a { color: var(--lime); }
+  .tiny { font-size: .65rem; }
+
+  #simonAlert {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,0,0,.9);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: clamp(2rem, 8vw, 6rem);
+    font-weight: bold;
+    z-index: 200;
+    padding: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div id="simonDetector">⚠ SIMON DETECTED NEARBY ⚠</div>
+
+<header>
+  <h1 id="logo" title="do not click">HARAMBE.ZONE</h1>
+  <p class="tagline">Est. 2026 &bull; Best viewed in Netscape 4 &bull; Simon not welcome</p>
+  <nav id="nav">
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="info">Info</button>
+    <button data-tab="about">About</button>
+  </nav>
+</header>
+
+<div class="marquee"><span>
+  BREAKING: Local man "Simon" STILL has not apologized &nbsp;🦍&nbsp;
+  Simon seen near the gorilla enclosure "just checking the moat depth" &nbsp;🦍&nbsp;
+  Cincinnati asks Simon to stop visiting &nbsp;🦍&nbsp;
+  Scientists confirm Simon has the emotional range of a wet banana peel &nbsp;🦍&nbsp;
+  Harambe Memorial Fund raises $0 after Simon offers to "help count it" &nbsp;🦍&nbsp;
+  JUSTICE FOR HARAMBE &nbsp;🦍&nbsp;
+</span></div>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <section id="home" class="active">
+    <div class="card hero">
+      <h2>Welcome to the Harambe Zone</h2>
+      <img src="harambe.jpg" alt="A western lowland gorilla sitting at the Cincinnati Zoo">
+      <p class="caption">A majestic king. Unlike Simon.<br>
+        (Gorilla at the Cincinnati Zoo, 2011. Could be Harambe. Could be one of his colleagues. We're vibecoding, not fact-checking the photo.)</p>
+    </div>
+
+    <div class="card">
+      <h2>Harambe Facts</h2>
+      <ul class="facts">
+        <li>Harambe was a <b>western lowland gorilla</b>, born on <b>May 27, 1999</b> at the Gladys Porter Zoo in Brownsville, Texas.</li>
+        <li>He moved to the <b>Cincinnati Zoo</b> in 2014.</li>
+        <li>He died on <b>May 28, 2016</b>, just one day after his 17th birthday. (Simon did not bring a card.)</li>
+        <li>He weighed around <b>440 lb (about 200 kg)</b> of pure majesty.</li>
+        <li>His name echoes <i>"harambee"</i>, a Swahili word meaning "all pull together", which is also Kenya's national motto. Something Simon has never done.</li>
+        <li>He became one of the biggest internet memes of 2016 and reportedly got <b>write-in votes</b> in that year's U.S. presidential election.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Simon's Guilt-O-Meter™</h2>
+      <div class="bar"><div id="guiltFill"></div><label id="guiltLabel">Calculating...</label></div>
+      <p>This bar measures how guilty Simon is. It does not stop at 100%.</p>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <h2>Press F to Pay Respects</h2>
+      <div id="respects">0</div>
+      <button class="btn" id="payBtn">F</button>
+      <p class="tiny">Your respects are saved locally. Simon's respects cannot be saved because he has none.</p>
+    </div>
+  </section>
+
+  <!-- ================= INFO ================= -->
+  <section id="info">
+    <div class="card">
+      <h2>Gorilla Info (Very Scientific)</h2>
+      <ul class="facts">
+        <li>Gorillas are the <b>largest living primates</b> on Earth.</li>
+        <li>There are <b>two species</b>, the eastern and the western gorilla, each with two subspecies. Harambe's kind, the western lowland gorilla, is <b>critically endangered</b>.</li>
+        <li>Gorillas share roughly <b>98% of their DNA</b> with humans. Simon shares about 4% with a functioning conscience.</li>
+        <li>Adult males are called <b>silverbacks</b> because of the silver saddle of hair that grows on their backs as they mature.</li>
+        <li>Gorillas are mostly vegetarian. A big male can eat around <b>40 lb (18 kg)</b> of plants in a single day.</li>
+        <li>They build a <b>fresh nest every night</b> out of leaves and branches. Five-star hotel behaviour.</li>
+        <li>Every gorilla has a <b>unique nose print</b>, a bit like a human fingerprint.</li>
+        <li>Gorillas get around by <b>knuckle-walking</b> on all fours.</li>
+        <li>A gorilla group is called a <b>troop</b>, and the dominant silverback leads it.</li>
+        <li>Gorillas have been recorded <b>humming and "singing"</b> while they eat good food.</li>
+        <li>A silverback's <b>chest beat</b> can be heard up to about a kilometre away.</li>
+        <li>Gorillas generally <b>can't swim</b> and avoid deep water.</li>
+        <li>Koko the gorilla learned more than <b>1,000 signs</b> of a modified sign language.</li>
+      </ul>
+    </div>
+
+    <div class="card roast">
+      <h2>Classified Intel on Simon</h2>
+      <ul class="facts">
+        <li>Simon's alibi for May 28, 2016: "I wasn't even in Ohio." Pretty convenient, Simon.</li>
+        <li>Witnesses report Simon muttering "it's just a big monkey". Gorillas are apes, Simon. <b>APES.</b></li>
+        <li>Simon tried to return his "RIP Harambe" T-shirt for store credit.</li>
+        <li>Simon owns a framed photo of the Cincinnati Zoo moat. Nobody knows why. Everybody suspects.</li>
+        <li>Simon eats bananas in front of gorillas. On purpose.</li>
+        <li>Simon's gorilla nose print came back as "inconclusive, suspicious".</li>
+        <li>Simon has been asked to leave 14 zoos, 3 aquariums and one petting farm.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <h2>Simon's Official Apology</h2>
+      <p>Click the button to read Simon's heartfelt apology.</p>
+      <button class="btn" id="runaway">Read Apology</button>
+      <p id="apologyText" class="tiny"></p>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="about">
+    <div class="card">
+      <h2>About This Website</h2>
+      <p>This site was <b>100% vibecoded</b>. No plan. No wireframes. No tests. Just vibes and bananas.</p>
+      <p>Features include, but are not limited to:</p>
+      <ul class="facts">
+        <li>A banana cursor trail that nobody asked for</li>
+        <li>Tabs that shuffle themselves every time you click one</li>
+        <li>A Simon Detector that is always on and always right</li>
+        <li>A visitor counter that only goes down</li>
+        <li>Clicking the logo spins the whole page. Clicking it 5 times flips it upside down.</li>
+        <li>Type "simon" anywhere on your keyboard. We dare you.</li>
+      </ul>
+      <p>Visitor count: <b id="visitors">1,000,000</b></p>
+      <button class="btn" id="fontBtn">Toggle Professional Mode</button>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <h2>About Harambe's Legacy</h2>
+      <img src="memorial.jpg" alt="Memorial brick reading Harambe 1999–2016 Cincinnati" style="max-width:100%;width:420px;border:8px solid #5a3b12">
+      <p class="caption">A memorial brick for Harambe in Cincinnati. Gone, but never forgotten.</p>
+      <ul class="facts" style="text-align:left">
+        <li>Harambe was 17 when he died. Gorillas can live <b>35–40 years</b> in the wild and often longer in zoos.</li>
+        <li>The oldest known gorilla, <b>Fatou</b> of Berlin Zoo, is in her late 60s.</li>
+        <li>"Dicks out for Harambe" was everywhere in 2016. Somehow that's still the second-worst thing from that year, behind Simon.</li>
+      </ul>
+    </div>
+
+    <div class="wanted">
+      <h2>WANTED</h2>
+      <div class="face">🧍</div>
+      <h3 style="font-size:2rem;margin:4px 0">SIMON</h3>
+      <p><b>Crimes:</b> Crimes against gorillas, vibes and humanity in general</p>
+      <p><b>Last seen:</b> Near a moat, looking guilty</p>
+      <p><b>Reward:</b> Closure</p>
+    </div>
+
+    <div class="card">
+      <h2>About the Team</h2>
+      <ul class="facts">
+        <li><b>Harambe</b>, Spiritual Advisor (forever)</li>
+        <li><b>The Vibes</b>, Lead Engineer</li>
+        <li><b>A Banana</b>, Head of UX</li>
+        <li><b>Simon</b>, banned. Not allowed on the team, near the team or within 500 ft of any primate.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 2026 HARAMBE.ZONE &bull; Made with 🍌 and zero planning<br>
+  <span class="tiny">
+    Photos: "Cincinnati Zoo Gorilla 2011" by Jason Miklacic (CC BY-SA 2.0) &bull;
+    "HARAMBE 1999 - 2016" by Tim Ide (CC BY 2.0), via Wikimedia Commons.<br>
+    Legal disclaimer: Simon did not actually have anything to do with Harambe. Probably. We're still looking into it.
+  </span>
+</footer>
+
+<div id="toast"></div>
+<div id="simonAlert" hidden>🚨 SIMON GET OUT 🚨</div>
+
+<script>
+  // ---------- Tabs (they shuffle, because vibes) ----------
+  const nav = document.getElementById('nav');
+  nav.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === btn.dataset.tab));
+    // shuffle tab order
+    const btns = [...nav.children];
+    btns.sort(() => Math.random() - 0.5).forEach(b => nav.appendChild(b));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ---------- Banana cursor trail ----------
+  let lastBanana = 0;
+  document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    if (now - lastBanana < 60) return;
+    lastBanana = now;
+    const b = document.createElement('div');
+    b.className = 'banana';
+    b.textContent = Math.random() < 0.1 ? '🦍' : '🍌';
+    b.style.left = e.clientX + 'px';
+    b.style.top = e.clientY + 'px';
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 1000);
+  });
+
+  // ---------- Logo spin / flip ----------
+  let logoClicks = 0;
+  document.getElementById('logo').addEventListener('click', () => {
+    logoClicks++;
+    if (logoClicks % 5 === 0) {
+      document.body.classList.toggle('upside');
+    } else {
+      document.body.classList.remove('spin');
+      void document.body.offsetWidth;
+      document.body.classList.add('spin');
+    }
+  });
+
+  // ---------- Guilt-O-Meter (goes past 100, then panics) ----------
+  const fill = document.getElementById('guiltFill');
+  const label = document.getElementById('guiltLabel');
+  let guilt = 0, dir = 1;
+  setInterval(() => {
+    guilt += dir * (Math.random() * 4);
+    if (guilt > 147) dir = -1;
+    if (guilt < 60) dir = 1;
+    fill.style.width = Math.min(guilt, 100) + '%';
+    label.textContent = guilt > 100
+      ? `${guilt.toFixed(0)}% GUILTY (METER BROKEN)`
+      : `${guilt.toFixed(0)}% guilty`;
+  }, 120);
+
+  // ---------- Pay respects ----------
+  const respectsEl = document.getElementById('respects');
+  let respects = 0;
+  try { respects = parseInt(localStorage.getItem('respects') || '0', 10); } catch (e) {}
+  respectsEl.textContent = respects;
+  function payRespects() {
+    respects++;
+    respectsEl.textContent = respects;
+    try { localStorage.setItem('respects', respects); } catch (e) {}
+    sadTrombone();
+  }
+  document.getElementById('payBtn').addEventListener('click', payRespects);
+
+  // ---------- Sad trombone (WebAudio) ----------
+  let audioCtx;
+  function sadTrombone() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [392, 370, 349, 311];
+      notes.forEach((f, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.value = f;
+        const t = audioCtx.currentTime + i * 0.35;
+        g.gain.setValueAtTime(0.08, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + (i === 3 ? 0.9 : 0.33));
+        o.connect(g).connect(audioCtx.destination);
+        o.start(t);
+        o.stop(t + 1);
+      });
+    } catch (e) {}
+  }
+
+  // ---------- Runaway apology button ----------
+  const runaway = document.getElementById('runaway');
+  let dodges = 0;
+  runaway.addEventListener('mouseenter', () => {
+    if (dodges >= 7) return;
+    dodges++;
+    runaway.style.left = (Math.random() * 240 - 120) + 'px';
+    runaway.style.top = (Math.random() * 80 - 40) + 'px';
+  });
+  runaway.addEventListener('click', () => {
+    document.getElementById('apologyText').textContent =
+      dodges >= 7
+        ? 'Simon\'s apology: "" (Simon submitted a blank page.)'
+        : 'Error 404: Apology not found. Simon has never apologized for anything.';
+  });
+
+  // ---------- Visitor counter (only goes down) ----------
+  let visitors = 1000000;
+  const visEl = document.getElementById('visitors');
+  setInterval(() => {
+    visitors -= Math.floor(Math.random() * 50);
+    visEl.textContent = visitors.toLocaleString();
+  }, 700);
+
+  // ---------- "Professional Mode" (just swaps to Arial and calls it a day) ----------
+  document.getElementById('fontBtn').addEventListener('click', e => {
+    document.body.classList.toggle('sans');
+    e.target.textContent = document.body.classList.contains('sans')
+      ? 'Return to Comic Sans (correct)'
+      : 'Toggle Professional Mode';
+  });
+
+  // ---------- Random Simon toasts ----------
+  const toastLines = [
+    'Fun fact: Simon thinks "silverback" is a credit card tier.',
+    'Reminder: Simon still owes Harambe an apology.',
+    'Simon tried to visit this site. Access denied. 🚫',
+    'Gorillas build a new nest every night. Simon can\'t even make his bed.',
+    'Simon just Googled "how deep is a zoo moat". Suspicious.',
+    'Harambe could tell a gorilla from a monkey. Simon could not.',
+    'This toast is sponsored by people who aren\'t Simon.',
+  ];
+  const toast = document.getElementById('toast');
+  function showToast() {
+    toast.textContent = toastLines[Math.floor(Math.random() * toastLines.length)];
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+  setTimeout(showToast, 4000);
+  setInterval(showToast, 15000);
+
+  // ---------- Keyboard nonsense ----------
+  let typed = '';
+  const simonAlert = document.getElementById('simonAlert');
+  document.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) payRespects();
+    typed = (typed + e.key.toLowerCase()).slice(-5);
+    if (typed === 'simon') {
+      simonAlert.hidden = false;
+      document.body.classList.add('shake');
+      setTimeout(() => {
+        simonAlert.hidden = true;
+        document.body.classList.remove('shake');
+      }, 1800);
+    }
+  });
+
+  // ---------- Simon detector changes its mind (it doesn't) ----------
+  const detector = document.getElementById('simonDetector');
+  const detectorLines = ['⚠ SIMON DETECTED NEARBY ⚠', '⚠ SIMON STILL DETECTED ⚠', '⚠ SIMON: 100% CONFIRMED ⚠', '⚠ HIDE THE GORILLAS ⚠'];
+  let dl = 0;
+  setInterval(() => { detector.textContent = detectorLines[++dl % detectorLines.length]; }, 3000);
+
+  // ---------- Page title changes when you leave ----------
+  const realTitle = document.title;
+  document.addEventListener('visibilitychange', () => {
+    document.title = document.hidden ? '🦍 come back... Simon is here' : realTitle;
+  });
+</script>
+</body>
+</html>
