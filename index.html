@@ -150,7 +150,76 @@
     margin: 20px auto;
   }
   .wanted h2 { font-size: 3rem; color: #5a3b12; text-decoration: none; margin: 0; letter-spacing: 6px; }
-  .wanted .face { font-size: 6rem; filter: grayscale(1); }
+  .wanted .face {
+    width: 220px;
+    max-width: 100%;
+    border: 6px solid #5a3b12;
+    filter: sepia(.8) contrast(1.2);
+    transform: rotate(-2deg);
+  }
+  .wanted .face { cursor: pointer; }
+
+  /* ---------- Creepypasta ---------- */
+  #creepy {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 300;
+    overflow: hidden;
+    cursor: none;
+    font-family: "Courier New", monospace;
+  }
+  #creepy canvas, #creepy video, #creepy .creepFace {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  #creepy canvas { opacity: .35; mix-blend-mode: screen; pointer-events: none; z-index: 3; }
+  #creepy video { object-fit: contain; background: #000; z-index: 1; }
+  #creepy .creepFace {
+    object-fit: cover;
+    filter: grayscale(1) contrast(2.5) brightness(.6);
+    animation: creepZoom 7s ease-in forwards, jitter .12s steps(2) infinite;
+    z-index: 1;
+  }
+  @keyframes creepZoom { from { transform: scale(1); } to { transform: scale(2.4); } }
+  @keyframes jitter {
+    0% { translate: 0 0; }
+    50% { translate: 4px -3px; }
+  }
+  #creepText {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    width: 90%;
+    text-align: center;
+    color: #b00000;
+    font-size: clamp(1.5rem, 6vw, 4rem);
+    font-weight: bold;
+    letter-spacing: 4px;
+    text-shadow: 3px 0 #0ff, -3px 0 #f00;
+    pointer-events: none;
+  }
+  #creepText.glitch { animation: glitch .25s steps(2) infinite; }
+  @keyframes glitch {
+    0% { transform: translate(-50%, -50%) skewX(0); }
+    50% { transform: translate(-52%, -49%) skewX(20deg); }
+  }
+  #creepEscape {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #555;
+    z-index: 5;
+    font-size: .9rem;
+  }
+  #simonAlert { flex-direction: column; gap: 12px; }
+  #simonAlert img { width: 160px; max-width: 40vw; border: 6px solid #fff; animation: spin .8s linear infinite; }
 
   .btn {
     font: inherit;
@@ -352,10 +421,11 @@
 
     <div class="wanted">
       <h2>WANTED</h2>
-      <div class="face">🧍</div>
+      <img class="face" id="simonFace" src="simon.jpg" alt="Simon, looking guilty" title="don't.">
+      <p class="tiny" style="margin:4px 0">(do not click his face)</p>
       <h3 style="font-size:2rem;margin:4px 0">SIMON</h3>
       <p><b>Crimes:</b> Crimes against gorillas, vibes and humanity in general</p>
-      <p><b>Last seen:</b> Near a moat, looking guilty</p>
+      <p><b>Last seen:</b> <span id="lastSeen">Near a moat, looking guilty</span></p>
       <p><b>Reward:</b> Closure</p>
     </div>
 
@@ -381,7 +451,19 @@
 </footer>
 
 <div id="toast"></div>
-<div id="simonAlert" hidden>🚨 SIMON GET OUT 🚨</div>
+<div id="creepy" hidden>
+  <!-- Drop a video named creepypasta.mp4 next to index.html and it plays here.
+       If it's missing, the glitchy Simon face plays instead. -->
+  <video id="creepVid" playsinline preload="none" hidden>
+    <source src="creepypasta.mp4" type="video/mp4">
+  </video>
+  <img class="creepFace" id="creepFace" src="simon.jpg" alt="" hidden>
+  <canvas id="creepStatic"></canvas>
+  <div id="creepText"></div>
+  <div id="creepEscape" hidden>click anywhere to escape... if you can</div>
+</div>
+
+<div id="simonAlert" hidden><img src="simon.jpg" alt="Simon">🚨 SIMON GET OUT 🚨</div>
 
 <script>
   // ---------- Tabs (they shuffle, because vibes) ----------
@@ -545,6 +627,108 @@
   const detectorLines = ['⚠ SIMON DETECTED NEARBY ⚠', '⚠ SIMON STILL DETECTED ⚠', '⚠ SIMON: 100% CONFIRMED ⚠', '⚠ HIDE THE GORILLAS ⚠'];
   let dl = 0;
   setInterval(() => { detector.textContent = detectorLines[++dl % detectorLines.length]; }, 3000);
+
+  // ---------- Creepypasta (click Simon's face) ----------
+  const creepy = document.getElementById('creepy');
+  const creepVid = document.getElementById('creepVid');
+  const creepFace = document.getElementById('creepFace');
+  const creepText = document.getElementById('creepText');
+  const creepEscape = document.getElementById('creepEscape');
+  const staticCanvas = document.getElementById('creepStatic');
+  const sctx = staticCanvas.getContext('2d');
+  let creepActive = false, staticRaf = 0, droneNodes = [], creepTimers = [];
+
+  function drawStatic() {
+    const w = staticCanvas.width = Math.ceil(innerWidth / 3);
+    const h = staticCanvas.height = Math.ceil(innerHeight / 3);
+    const img = sctx.createImageData(w, h);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.random() * 255;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    sctx.putImageData(img, 0, 0);
+    staticRaf = requestAnimationFrame(drawStatic);
+  }
+
+  function startDrone() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const g = audioCtx.createGain();
+      g.gain.value = 0.05;
+      g.connect(audioCtx.destination);
+      [55, 58.3].forEach(f => {
+        const o = audioCtx.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.value = f;
+        o.connect(g);
+        o.start();
+        droneNodes.push(o);
+      });
+      droneNodes.push(g);
+    } catch (e) {}
+  }
+  function stopDrone() {
+    droneNodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch (e) {} });
+    droneNodes = [];
+  }
+
+  function later(fn, ms) { creepTimers.push(setTimeout(fn, ms)); }
+
+  let fallbackStarted = false;
+  function playFallback() {
+    if (!creepActive || fallbackStarted) return;
+    fallbackStarted = true;
+    creepVid.hidden = true;
+    creepFace.hidden = false;
+    startDrone();
+    const lines = ['you shouldn\'t have clicked', 'he was there', 'at the moat', 'HE IS STILL THERE', 'TURN AROUND'];
+    lines.forEach((t, i) => later(() => {
+      creepText.textContent = t;
+      creepText.classList.toggle('glitch', i >= 3);
+    }, 800 + i * 1300));
+    later(() => { creepText.textContent = ''; creepFace.style.filter = 'invert(1) contrast(3)'; }, 800 + lines.length * 1300);
+    later(closeCreepy, 800 + lines.length * 1300 + 900);
+  }
+
+  function openCreepy() {
+    if (creepActive) return;
+    creepActive = true;
+    fallbackStarted = false;
+    creepy.hidden = false;
+    creepText.textContent = '';
+    creepEscape.hidden = true;
+    creepFace.style.filter = '';
+    document.title = 'HE SEES YOU';
+    drawStatic();
+    later(() => { creepEscape.hidden = false; }, 4000);
+
+    creepVid.hidden = false;
+    creepVid.currentTime = 0;
+    creepVid.load();
+    creepVid.play().catch(playFallback);
+  }
+
+  function closeCreepy() {
+    if (!creepActive) return;
+    creepActive = false;
+    creepTimers.forEach(clearTimeout);
+    creepTimers = [];
+    cancelAnimationFrame(staticRaf);
+    stopDrone();
+    creepVid.pause();
+    creepVid.hidden = true;
+    creepFace.hidden = true;
+    creepy.hidden = true;
+    document.title = realTitle;
+    document.getElementById('lastSeen').textContent = 'BEHIND YOU';
+  }
+
+  creepVid.addEventListener('ended', closeCreepy);
+  creepVid.addEventListener('error', playFallback, true);
+  document.getElementById('simonFace').addEventListener('click', openCreepy);
+  creepy.addEventListener('click', () => { if (!creepEscape.hidden) closeCreepy(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCreepy(); });
 
   // ---------- Page title changes when you leave ----------
   const realTitle = document.title;
